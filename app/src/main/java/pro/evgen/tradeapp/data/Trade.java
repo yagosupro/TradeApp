@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -21,8 +22,10 @@ import java.util.Map;
 public class Trade {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonPropertyOrder({
+            "id",
             "type",
             "coin",
+            "owner",
             "amount",
             "otherCoin",
             "otherAmount",
@@ -32,16 +35,21 @@ public class Trade {
             "confirmed",
             "lastPrice",
             "lastGas",
-            "blockDate"
+            "blockDate",
+            "ownerCount"
     })
 //    @PrimaryKey(autoGenerate = true)
 //    private int id;
-
+    @PrimaryKey
+    @NonNull
+    @JsonProperty("id")
+    private String id;
     @JsonProperty("type")
     private String type;
-
     @JsonProperty("coin")
     private String coin;
+    @JsonIgnore
+    private String owner;
     @JsonProperty("amount")
     private double amount;
     @JsonProperty("otherCoin")
@@ -50,9 +58,7 @@ public class Trade {
     private double otherAmount;
     @JsonProperty("ethAmount")
     private double ethAmount;
-    @PrimaryKey
     @JsonProperty("hash")
-    @NonNull
     private String hash;
     @JsonProperty("block")
     private int block;
@@ -68,15 +74,21 @@ public class Trade {
     @Ignore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-//    @JsonIgnore
-//    public int getId() {
-//        return id;
-//    }
-//
-//    @JsonIgnore
-//    public void setId(int id) {
-//        this.id = id;
-//    }
+    public String getId() {
+        return id;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
 
     @JsonProperty("type")
     public String getType() {
