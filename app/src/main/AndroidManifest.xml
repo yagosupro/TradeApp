@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="pro.evgen.tradeapp">
     <uses-permission android:name="android.permission.INTERNET">
+        android:name="android.permission.VIBRATE"/>
     </uses-permission>
 
 
@@ -13,8 +14,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TradeApp">
+        <service android:name=".ws.WebSocketService"/>
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".utils.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

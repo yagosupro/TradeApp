@@ -55,27 +55,26 @@ public class TradeAdapter extends RecyclerView.Adapter<TradeAdapter.TradeViewHol
     public void onBindViewHolder(@NonNull TradeViewHolder holder, int position) {
         Trade tradeInfo = tradeInfoList.get(position);
 //        holder.textViewType.setText(tradeInfo.getType());
-        holder.textViewAmount.setText(String.valueOf(tradeInfo.getAmount()));
+        holder.textViewAmount.setText(String.valueOf(Math.floor(tradeInfo.getAmount() * 100) / 100.0));
         holder.textViewCoin.setText(tradeInfo.getCoin());
         holder.textViewOtherCoin.setText(tradeInfo.getOtherCoin());
-        holder.textViewOtherAmount.setText(String.valueOf(tradeInfo.getOtherAmount()));
+        holder.textViewOtherAmount.setText(String.valueOf(Math.floor(tradeInfo.getOtherAmount() * 100) / 100.0));
 
+//
+//        if (tradeInfo.isConfirmed()){
+//            holder.cardView.setCardBackgroundColor(Color.parseColor("#000000"));
+//
+//        } else {
+        holder.textViewAmount.setShadowLayer(0, 0, 0, 0);
+        holder.textViewOtherAmount.setShadowLayer(0, 0, 0, 0);
+        holder.textViewOtherCoin.setShadowLayer(0, 0, 0, 0);
+        holder.textViewCoin.setShadowLayer(0, 0, 0, 0);
+        holder.textViewCoin.setTextColor(Color.parseColor("#ABABAB"));
+        holder.textViewOtherAmount.setTextColor(Color.parseColor("#ABABAB"));
+        holder.textViewAmount.setTextColor(Color.parseColor("#ABABAB"));
+        holder.textViewOtherCoin.setTextColor(Color.parseColor("#ABABAB"));
 
-        if (tradeInfo.isConfirmed()){
-            holder.cardView.setCardBackgroundColor(Color.parseColor("#000000"));
-
-        } else {
-            holder.textViewAmount.setShadowLayer(0,0,0,0);
-            holder.textViewOtherAmount.setShadowLayer(0,0,0,0);
-            holder.textViewOtherCoin.setShadowLayer(0,0,0,0);
-            holder.textViewCoin.setShadowLayer(0,0,0,0);
-            holder.textViewCoin.setTextColor(Color.parseColor("#ABABAB"));
-            holder.textViewOtherAmount.setTextColor(Color.parseColor("#ABABAB"));
-            holder.textViewAmount.setTextColor(Color.parseColor("#ABABAB"));
-            holder.textViewOtherCoin.setTextColor(Color.parseColor("#ABABAB"));
-
-
-        }
+//    }
         if (tradeInfo.getType().equals("BUY")){
             holder.imageView.setImageResource(R.drawable.ic_baseline_call_made_24);
         } if (tradeInfo.getType().equals("SELL")){

@@ -1,4 +1,4 @@
-package pro.evgen.tradeapp;
+package pro.evgen.tradeapp.utils;
 
 import android.app.Application;
 import android.os.AsyncTask;
@@ -9,14 +9,10 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 
 import pro.evgen.tradeapp.data.Trade;
 import pro.evgen.tradeapp.data.TradeDataBase;
-import pro.evgen.tradeapp.ws.WsConnection;
-import pro.evgen.tradeapp.ws.WsService;
 
 public class TradeViewModel extends AndroidViewModel {
     private static TradeDataBase dataBase;
@@ -29,9 +25,27 @@ public class TradeViewModel extends AndroidViewModel {
         dataBase = TradeDataBase.getInstance(application);
     }
 
+
     public void load() {
         tradeList =  dataBase.tradeInfoDao().getAllTrade(moreThan);
     }
+
+
+//    public void insertTrade(Trade trade) {
+//        new InsertTradeTask().execute(trade);
+//    }
+//
+//    private static class InsertTradeTask extends AsyncTask<Trade, Void, Void> {
+//
+//
+//        @Override
+//        protected Void doInBackground(Trade... trades) {
+//            if (trades != null) {
+//                dataBase.tradeInfoDao().insertTrade(trades[0]);
+//            }
+//            return null;
+//        }
+//    }
 
 
 

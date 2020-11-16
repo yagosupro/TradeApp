@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">TradeApp</string>
+    <string name="chanel_name">ChanelNotification</string>
+    <string name="channel_description">ChanelDesc</string>
 </resources>

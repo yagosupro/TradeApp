@@ -13,15 +13,13 @@
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#C4000000"
-       >
+        android:background="#22f3cf8f">
 
 
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="25dp"
             android:layout_height="15sp"
-
             android:layout_gravity="clip_horizontal|center"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -39,7 +37,7 @@
             android:shadowRadius="10"
             android:text="27,13"
             android:textSize="10sp"
-            android:textColor="#FFFFFF"
+            android:textColor="#000000"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/imageView"
             app:layout_constraintTop_toTopOf="parent" />
@@ -55,7 +53,7 @@
             android:shadowRadius="10"
             android:text="FARM"
             android:textSize="10sp"
-            android:textColor="#FFFFFF"
+            android:textColor="#000000"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/textViewAmount"
             app:layout_constraintTop_toTopOf="parent" />
@@ -71,7 +69,7 @@
             android:shadowRadius="10"
             android:text="for USDS"
             android:textSize="10sp"
-            android:textColor="#FFFFFF"
+            android:textColor="#000000"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/textViewCoin"
             app:layout_constraintTop_toTopOf="parent" />
@@ -87,7 +85,7 @@
             android:shadowRadius="10"
             android:text="2719,08"
             android:textSize="10sp"
-            android:textColor="#FFFFFF"
+            android:textColor="#000000"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/textViewOtherCoin"
             app:layout_constraintTop_toTopOf="parent" />
