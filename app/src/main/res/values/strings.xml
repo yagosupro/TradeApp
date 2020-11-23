@@ -1,5 +1,10 @@
 <resources>
     <string name="app_name">TradeApp</string>
-    <string name="chanel_name">ChanelNotification</string>
-    <string name="channel_description">ChanelDesc</string>
+    <string name="chanel_name">MyChanelNotification</string>
+    <string name="channel_description">MyChanelDesc</string>
+    <string name="last_gas">Last gas:</string>
+    <string name="block_date">Block date:</string>
+    <string name="last_price">Last price:</string>
+    <string name="info">Info:</string>
+    <string name="go_to_etherscan_button_title">Go to etherscan</string>
 </resources>

@@ -1,13 +1,10 @@
-package pro.evgen.tradeapp.ws;
+package pro.evgen.tradeapp.service;
 
-import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
-import android.app.NotificationChannelGroup;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,55 +13,48 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
-import android.os.SystemClock;
-import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 import pro.evgen.tradeapp.R;
 import pro.evgen.tradeapp.data.Trade;
 import pro.evgen.tradeapp.data.TradeDataBase;
 import pro.evgen.tradeapp.utils.MainActivity;
-import pro.evgen.tradeapp.utils.TradeViewModel;
+import pro.evgen.tradeapp.ws.WsConnection;
 
 public class WebSocketService extends Service {
     private static final String LOG_TAG = "TradeAppLog";
-    private static int NOTIFY_ID = 101;
-    private static String CHANNEL_ID = "MyChanel1";
+    private static int NOTIFY_ID = 1;
+    private static final String CHANNEL_ID = "MyChanel11";
 
     private WsConnection wsConnection;
     private TradeDataBase dataBase;
+    private PendingIntent contentIntent;
+    private Uri ringURI;
+    private Intent notificationIntent;
+    private long[] vibrate;
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.e(LOG_TAG, "onBind");
         return null;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.e(LOG_TAG, "onCreate");
+        vibrate = new long[]{500, 500, 500};
+
         dataBase = TradeDataBase.getInstance(getApplicationContext());
         wsConnection = new WsConnection();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         startLoad();
-        createNotificationChannel();
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -96,43 +86,8 @@ public class WebSocketService extends Service {
         }).start();
     }
 
-    private void sendNotification(String type, String coin, double amount, String otherCoin, double otherAmount) {
 
-        long[] vibrate = new long[]{500, 500, 500};
-        Uri ringURI =
-                RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALL);
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(this,
-                0, notificationIntent,
-                PendingIntent.FLAG_CANCEL_CURRENT);
-
-        @SuppressLint("ResourceAsColor") Notification builder =
-                new NotificationCompat.Builder(this, CHANNEL_ID)
-                        .setSmallIcon(R.drawable.traktor)
-                        .setContentTitle(type)
-                        .setContentText(amount + " " + coin + " for " + otherCoin + " " + otherAmount)
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                        .setContentIntent(contentIntent)
-                        .setAutoCancel(true)
-                        .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_baseline_swap_vert_red))
-                        .setLargeIcon(setDrawableSort())
-                        .setSound(ringURI)
-                        .setVibrate(vibrate)
-                        .setPriority(NotificationCompat.PRIORITY_HIGH)
-                        .build();
-
-        NotificationManagerCompat notificationManager =
-                NotificationManagerCompat.from(this);
-        notificationManager.notify(NOTIFY_ID, builder);
-        if (NOTIFY_ID == 100) {
-            NOTIFY_ID = 0;
-        }
-        NOTIFY_ID++;
-
-    }
-    private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
+    void sendNotification(String type, String coin, double amount, String otherCoin, double otherAmount) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = getString(R.string.chanel_name);
             String description = getString(R.string.channel_description);
@@ -141,12 +96,37 @@ public class WebSocketService extends Service {
             channel.setDescription(description);
             channel.enableLights(true);
             channel.setLightColor(Color.RED);
-            channel.enableVibration(false);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
+            channel.enableVibration(true);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
+
+        ringURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        notificationIntent = new Intent(this, MainActivity.class);
+        contentIntent = PendingIntent.getActivity(this, 0, notificationIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT);
+
+        Notification builder =
+                new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                        .setSmallIcon(R.drawable.traktor)
+                        .setContentTitle(type)
+                        .setContentText(amount + " " + coin + " for " + otherCoin + " " + otherAmount)
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setContentIntent(contentIntent)
+                        .setAutoCancel(true)
+                        .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_baseline_swap_vert_red))
+                        .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALL))
+                        .setVibrate(vibrate)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH).build();
+
+
+        NotificationManagerCompat notificationManagerCompat =
+                NotificationManagerCompat.from(this);
+        notificationManagerCompat.notify(NOTIFY_ID, builder);
+        if (NOTIFY_ID == 100) {
+            NOTIFY_ID = 0;
+        }
+        NOTIFY_ID++;
     }
 
     private Bitmap setDrawableSort() {
