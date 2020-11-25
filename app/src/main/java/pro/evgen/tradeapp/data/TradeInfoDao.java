@@ -12,7 +12,7 @@ import java.util.List;
 
 @Dao
 public interface TradeInfoDao {
-    @Query("SELECT * FROM info WHERE amount > :moreThen")
+    @Query("SELECT * FROM info WHERE amount > :moreThen ORDER BY blockDate")
     LiveData<List<Trade>> getAllTrade(double moreThen);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -20,4 +20,11 @@ public interface TradeInfoDao {
 
     @Query("DELETE FROM info")
     void deleteAllEmployees();
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertTrades(List<Trade>tradeList);
+
+    @Query("SELECT* FROM info ORDER BY blockDate DESC LIMIT 1")
+    LiveData<Trade> getLastTrade();
+
 }

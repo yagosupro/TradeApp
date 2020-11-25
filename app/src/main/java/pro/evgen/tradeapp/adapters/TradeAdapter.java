@@ -2,13 +2,11 @@ package pro.evgen.tradeapp.adapters;
 
 import android.graphics.Color;
 import android.os.Build;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -21,12 +19,10 @@ import java.util.function.Consumer;
 
 import pro.evgen.tradeapp.R;
 import pro.evgen.tradeapp.data.Trade;
-import pro.evgen.tradeapp.utils.MainActivity;
 
 public class TradeAdapter extends RecyclerView.Adapter<TradeAdapter.TradeViewHolder> {
 
     private List<Trade> tradeInfoList;
-    private Consumer<Integer> onTradeInfoClickListener;
     private Consumer<Integer> onShowMoreClickListener;
 
     public void setOnShowMoreClickListener(Consumer<Integer> onShowMoreClickListener) {

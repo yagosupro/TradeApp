@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="pro.evgen.tradeapp">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET"/>
 
@@ -16,13 +17,22 @@
         android:theme="@style/Theme.TradeApp"
         tools:ignore="AllowBackup"
         tools:targetApi="n">
+        <receiver
+            android:name=".network.NetworkChangeReceiver"
+            android:label="NetworkChangeReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"
+                    tools:ignore="BatteryLife" />
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
         <activity
-            android:name=".utils.MoreInfoActivity"
+            android:name=".activities.MoreInfoActivity"
             android:theme="@style/Theme.AppCompat.Dialog" />
 
         <service android:name=".service.WebSocketService" />
 
-        <activity android:name=".utils.MainActivity">
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -1,5 +1,7 @@
 package pro.evgen.tradeapp.data;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -8,216 +10,208 @@ import androidx.room.PrimaryKey;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+
 import java.util.HashMap;
 import java.util.Map;
 
 @Entity(tableName = "info")
 public class Trade {
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonPropertyOrder({
-            "id",
-            "type",
-            "coin",
-            "owner",
-            "amount",
-            "otherCoin",
-            "otherAmount",
-            "ethAmount",
-            "hash",
-            "block",
-            "confirmed",
-            "lastPrice",
-            "lastGas",
-            "blockDate",
-            "ownerCount"
-    })
-//    @PrimaryKey(autoGenerate = true)
-//    private int id;
     @PrimaryKey
+    @SerializedName("id")
+    @Expose
     @NonNull
-    @JsonProperty("id")
     private String id;
-    @JsonProperty("type")
+    @SerializedName("type")
+    @Expose
     private String type;
-    @JsonProperty("coin")
+    @SerializedName("coin")
+    @Expose
     private String coin;
-    @JsonIgnore
+    @SerializedName("owner")
+    @Expose
     private String owner;
-    @JsonProperty("amount")
-    private double amount;
-    @JsonProperty("otherCoin")
+    @SerializedName("amount")
+    @Expose
+    private Double amount;
+    @SerializedName("otherCoin")
+    @Expose
     private String otherCoin;
-    @JsonProperty("otherAmount")
-    private double otherAmount;
-    @JsonProperty("ethAmount")
-    private double ethAmount;
-    @JsonProperty("hash")
+    @SerializedName("otherAmount")
+    @Expose
+    private Double otherAmount;
+    @SerializedName("ethAmount")
+    @Expose
+    private Double ethAmount;
+    @SerializedName("hash")
+    @Expose
     private String hash;
-    @JsonProperty("block")
-    private int block;
-    @JsonProperty("confirmed")
-    private boolean confirmed;
-    @JsonProperty("lastPrice")
-    private double lastPrice;
-    @JsonProperty("lastGas")
-    private double lastGas;
-    @JsonProperty("blockDate")
-    private int blockDate;
-    @JsonIgnore
+    @SerializedName("block")
+    @Expose
+    private Integer block;
+    @SerializedName("confirmed")
+    @Expose
+    private Boolean confirmed;
+    @SerializedName("lastPrice")
+    @Expose
+    private Double lastPrice;
+    @SerializedName("lastGas")
+    @Expose
+    private Double lastGas;
+    @SerializedName("blockDate")
+    @Expose
+    private Long blockDate;
+    @SerializedName("ownerCount")
+    @Expose
+    private Integer ownerCount;
     @Ignore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    @SerializedName("psWeekApy")
+    @Expose
+    private Object psWeekApy;
+    @Ignore
+    @SerializedName("psIncomeUsd")
+    @Expose
+    private Object psIncomeUsd;
 
     public String getId() {
         return id;
-    }
-
-    public String getOwner() {
-        return owner;
     }
 
     public void setId(String id) {
         this.id = id;
     }
 
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
-
-    @JsonProperty("type")
     public String getType() {
         return type;
     }
 
-    @JsonProperty("type")
     public void setType(String type) {
         this.type = type;
     }
 
-    @JsonProperty("coin")
     public String getCoin() {
         return coin;
     }
 
-    @JsonProperty("coin")
     public void setCoin(String coin) {
         this.coin = coin;
     }
 
-    @JsonProperty("amount")
-    public double getAmount() {
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public Double getAmount() {
         return amount;
     }
 
-    @JsonProperty("amount")
-    public void setAmount(double amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 
-    @JsonProperty("otherCoin")
     public String getOtherCoin() {
         return otherCoin;
     }
 
-    @JsonProperty("otherCoin")
     public void setOtherCoin(String otherCoin) {
         this.otherCoin = otherCoin;
     }
 
-    @JsonProperty("otherAmount")
-    public double getOtherAmount() {
+    public Double getOtherAmount() {
         return otherAmount;
     }
 
-    @JsonProperty("otherAmount")
-    public void setOtherAmount(double otherAmount) {
+    public void setOtherAmount(Double otherAmount) {
         this.otherAmount = otherAmount;
     }
 
-    @JsonProperty("ethAmount")
-    public double getEthAmount() {
+    public Double getEthAmount() {
         return ethAmount;
     }
 
-    @JsonProperty("ethAmount")
-    public void setEthAmount(double ethAmount) {
+    public void setEthAmount(Double ethAmount) {
         this.ethAmount = ethAmount;
     }
 
-    @JsonProperty("hash")
     public String getHash() {
         return hash;
     }
 
-    @JsonProperty("hash")
     public void setHash(String hash) {
         this.hash = hash;
     }
 
-    @JsonProperty("block")
-    public int getBlock() {
+    public Integer getBlock() {
         return block;
     }
 
-    @JsonProperty("block")
-    public void setBlock(int block) {
+    public void setBlock(Integer block) {
         this.block = block;
     }
 
-    @JsonProperty("confirmed")
-    public boolean isConfirmed() {
+    public Boolean getConfirmed() {
         return confirmed;
     }
 
-    @JsonProperty("confirmed")
-    public void setConfirmed(boolean confirmed) {
+    public void setConfirmed(Boolean confirmed) {
         this.confirmed = confirmed;
     }
 
-    @JsonProperty("lastPrice")
-    public double getLastPrice() {
+    public Double getLastPrice() {
         return lastPrice;
     }
 
-    @JsonProperty("lastPrice")
-    public void setLastPrice(double lastPrice) {
+    public void setLastPrice(Double lastPrice) {
         this.lastPrice = lastPrice;
     }
 
-    @JsonProperty("lastGas")
-    public double getLastGas() {
+    public Double getLastGas() {
         return lastGas;
     }
 
-    @JsonProperty("lastGas")
-    public void setLastGas(double lastGas) {
+    public void setLastGas(Double lastGas) {
         this.lastGas = lastGas;
     }
 
-    @JsonProperty("blockDate")
-    public int getBlockDate() {
+    public Long getBlockDate() {
         return blockDate;
     }
 
-    @JsonProperty("blockDate")
-    public void setBlockDate(int blockDate) {
+    public void setBlockDate(Long blockDate) {
         this.blockDate = blockDate;
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
+    public Integer getOwnerCount() {
+        return ownerCount;
     }
 
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
+    public void setOwnerCount(Integer ownerCount) {
+        this.ownerCount = ownerCount;
+    }
+
+    public Object getPsWeekApy() {
+        return psWeekApy;
+    }
+
+    public void setPsWeekApy(Object psWeekApy) {
+        this.psWeekApy = psWeekApy;
+    }
+
+    public Object getPsIncomeUsd() {
+        return psIncomeUsd;
+    }
+
+    public void setPsIncomeUsd(Object psIncomeUsd) {
+        this.psIncomeUsd = psIncomeUsd;
     }
 
 }

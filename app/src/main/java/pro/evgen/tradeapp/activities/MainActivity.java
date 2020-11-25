@@ -1,4 +1,4 @@
-package pro.evgen.tradeapp.utils;
+package pro.evgen.tradeapp.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.SeekBar;
@@ -15,30 +16,28 @@ import android.widget.Toast;
 
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
-import pro.evgen.tradeapp.api.ApiFactory;
-import pro.evgen.tradeapp.api.ApiService;
-import pro.evgen.tradeapp.api.TradeInfo;
+import pro.evgen.tradeapp.Constants;
+import pro.evgen.tradeapp.service.WebSocketService;
+import pro.evgen.tradeapp.viewModels.CardViewModel;
+import pro.evgen.tradeapp.viewModels.TradeFromRestViewModel;
 import pro.evgen.tradeapp.R;
 import pro.evgen.tradeapp.adapters.TradeAdapter;
 import pro.evgen.tradeapp.data.Trade;
-import pro.evgen.tradeapp.service.WebSocketService;
+import pro.evgen.tradeapp.network.NetworkUtils;
+import pro.evgen.tradeapp.viewModels.TradeViewModel;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String LOG_TAG = "MyTradeLog";
     private RecyclerView recyclerView;
     private TradeAdapter tradeAdapter;
     private SeekBar seekBar;
     private TradeViewModel tradeViewModel;
     private static final String HASH_URL = "https://etherscan.io/tx/%s";
     private TextView lastPriceMain;
-    private float x1, x2, y1, y2;
+    private TradeFromRestViewModel tradeFromRestViewModel;
+    private CardViewModel cardViewModel;
 
 
     @Override
@@ -51,34 +50,44 @@ public class MainActivity extends AppCompatActivity {
         setAdapter();
         initSeekBar();
         initTradeView(0);
-        startService(new Intent(this, WebSocketService.class));
+        loadDataFromRest();
         showMore();
-        ifWebsocketConnectionClose();
+        setCardFarmPriceInfo();
+
+        Intent ws = new Intent(this, WebSocketService.class);
+        startService(ws);
+    }
+
+    private void setCardFarmPriceInfo() {
+        cardViewModel = ViewModelProviders.of(MainActivity.this).get(CardViewModel.class);
+        cardViewModel.getTradeLiveData().observe(this, new Observer<Trade>() {
+            @Override
+            public void onChanged(Trade trade) {
+                lastPriceMain.setText(String.valueOf(Math.floor(trade.getLastPrice() * 100) / 100.0));
+            }
+        });
 
 
     }
 
-    private void ifWebsocketConnectionClose() {
-        List<TradeInfo> tradeInfos2 = new ArrayList<>();
-        ApiFactory apiFactory = ApiFactory.getInstance();
-        ApiService apiService = apiFactory.getApiService();
-        apiService.getTrades()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<List<TradeInfo>>() {
+    private void loadDataFromRest() {
+        try {
+            if (NetworkUtils.checkNetwork(getApplicationContext())) {
+                tradeFromRestViewModel = ViewModelProviders.of(this).get(TradeFromRestViewModel.class);
+                tradeFromRestViewModel.getTrades().observe(this, new Observer<List<Trade>>() {
                     @Override
-                    public void accept(List<TradeInfo> tradeInfos) throws Exception {
-                        tradeInfos2.addAll(tradeInfos);
-                        Log.e(LOG_TAG, ""+tradeInfos2.size());
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        Log.e(LOG_TAG, throwable.getMessage());
+                    public void onChanged(List<Trade> tradeList) {
+                        tradeAdapter.setTradeInfoList(tradeList);
                     }
                 });
+            } else {
+                Toast.makeText(this, "Sorry,no internet connectivty", Toast.LENGTH_SHORT).show();
+            }
+            tradeFromRestViewModel.loadDataFromRest();
+        } catch (Exception e) {
+            Log.e(Constants.LOG_TAG, e.getMessage());
+        }
     }
-
 
     private void initTradeView(double moreThan) {
         tradeViewModel = ViewModelProviders.of(MainActivity.this).get(TradeViewModel.class);
@@ -89,17 +98,14 @@ public class MainActivity extends AppCompatActivity {
             public void onChanged(List<Trade> tradeList) {
                 tradeAdapter.setTradeInfoList(tradeList);
                 recyclerView.scrollToPosition(tradeAdapter.getItemCount() - 1);
-                int size = tradeAdapter.getItemCount() - 1;
-                Trade trade = tradeList.get(size);
-                double d = Math.floor(trade.getLastPrice() * 100) / 100.0;
-                lastPriceMain.setText(String.valueOf(d));
+                Trade trade = tradeList.get(tradeAdapter.getItemCount() - 1);
+
             }
         });
         tradeViewModel.load();
     }
 
     private void initSeekBar() {
-
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -119,12 +125,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
     private void setAdapter() {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         tradeAdapter = new TradeAdapter();
         recyclerView.setAdapter(tradeAdapter);
-
     }
 
     private void init() {
@@ -144,19 +148,17 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("lastGas", Math.floor(trade.getLastGas() * 100) / 100.0);
             intent.putExtra("lastPrice", Math.floor(trade.getLastPrice() * 100) / 100.0);
             intent.putExtra("hash", getHash(trade.getHash()));
-            Log.e(LOG_TAG, "" + trade.getLastGas());
-            Log.e(LOG_TAG, "" + trade.getLastPrice());
             startActivity(intent);
         });
     }
 
     private String getHash(String hash) {
-        return HASH_URL + hash;
+        return String.format(HASH_URL, hash);
     }
 
-    private String getDate(int i) {
-        Date date = new Date(i);
-        SimpleDateFormat sdf = new SimpleDateFormat("d/MM/yyyy hh:mm:ss");
+    private String getDate(long i) {
+        Date date = new Date(i * 1000);
+        SimpleDateFormat sdf = new SimpleDateFormat("d/MM/yyyy hh:mm:ss aaa");
         return sdf.format(date);
     }
 }

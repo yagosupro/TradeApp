@@ -1,4 +1,4 @@
-package pro.evgen.tradeapp.utils;
+package pro.evgen.tradeapp.viewModels;
 
 import android.app.Application;
 import android.os.AsyncTask;
@@ -25,29 +25,9 @@ public class TradeViewModel extends AndroidViewModel {
         dataBase = TradeDataBase.getInstance(application);
     }
 
-
     public void load() {
         tradeList =  dataBase.tradeInfoDao().getAllTrade(moreThan);
     }
-
-
-//    public void insertTrade(Trade trade) {
-//        new InsertTradeTask().execute(trade);
-//    }
-//
-//    private static class InsertTradeTask extends AsyncTask<Trade, Void, Void> {
-//
-//
-//        @Override
-//        protected Void doInBackground(Trade... trades) {
-//            if (trades != null) {
-//                dataBase.tradeInfoDao().insertTrade(trades[0]);
-//            }
-//            return null;
-//        }
-//    }
-
-
 
     public void setMoreThan(double moreThan) {
         this.moreThan = moreThan;
@@ -61,8 +41,6 @@ public class TradeViewModel extends AndroidViewModel {
         return tradeList;
     }
 
-
-
     public void deleteAllTrade() {
         new DeleteAllTradeTask().execute();
     }
@@ -75,5 +53,7 @@ public class TradeViewModel extends AndroidViewModel {
             return null;
         }
     }
+
+
 }
 

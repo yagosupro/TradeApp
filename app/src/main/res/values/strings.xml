@@ -7,4 +7,7 @@
     <string name="last_price">Last price:</string>
     <string name="info">Info:</string>
     <string name="go_to_etherscan_button_title">Go to etherscan</string>
+    <string name="uri_farmdashboard_websocket">"https://api.farmdashboard.xyz:4140/stomp/websocket"</string>
+    <string name="uri_farmdashboard_websocket_test">"http://192.168.1.68:4140//stomp/websocket"</string>
+    <string name="farm_price_label">Farm Price</string>
 </resources>

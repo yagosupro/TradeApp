@@ -21,6 +21,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
+import pro.evgen.tradeapp.Constants;
 import pro.evgen.tradeapp.data.Trade;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
@@ -28,9 +29,8 @@ import ua.naiksoftware.stomp.dto.StompMessage;
 
 public class WsConnection {
     private ObjectMapper mapper;
-
-    private static final String LOG_TAG = "TradeAppTAG";
     private CompositeDisposable compositeDisposable;
+
 
     public BlockingQueue<Trade> initConnection() {
         BlockingQueue<Trade> queue = new ArrayBlockingQueue<>(1000);
@@ -45,48 +45,50 @@ public class WsConnection {
 
 
     private void connect(Consumer<StompMessage> messageHandler) {
+        StompClient mStompClient = null;
+        try {
+            mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP,
+                    "https://api.farmdashboard.xyz:4140/stomp/websocket",
+                    null,
+                    createHttpClient());
+            resetSubscriptions();
+
+            Disposable dispLifecycle = mStompClient.lifecycle()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(lifecycleEvent -> {
+                        switch (lifecycleEvent.getType()) {
+                            case OPENED:
+                                Log.e(Constants.LOG_TAG, "Stomp connection open");
+                                break;
+                            case ERROR:
+                                Log.e(Constants.LOG_TAG, "Stomp connection error", lifecycleEvent.getException());
+                                break;
+                            case CLOSED:
+                                Log.e(Constants.LOG_TAG, "Stomp connection closed");
+                                resetSubscriptions();
+                                break;
+                        }
+                    });
+            compositeDisposable.add(dispLifecycle);
+        }catch (Exception e){
+            Log.e(Constants.LOG_TAG, e.getMessage());
+        }
 
 
-//        StompClient mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "http://192.168.1.68:4140//stomp/websocket");
-//        StompClient mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP , "https://api.farmdashboard.xyz:4140/stomp/websocket");
+        if (mStompClient != null) {
+            Disposable dispTopic = mStompClient.topic("/topic/transactions")
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(messageHandler, throwable -> {
+                        Log.e(Constants.LOG_TAG, "Error on subscribe topic", throwable);
+                    });
 
-
-        StompClient mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP,
-                "https://api.farmdashboard.xyz:4140/stomp/websocket",
-                null,
-                createHttpClient());
-        resetSubscriptions();
-
-        Disposable dispLifecycle = mStompClient.lifecycle()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(lifecycleEvent -> {
-                    switch (lifecycleEvent.getType()) {
-                        case OPENED:
-                            Log.e(LOG_TAG, "Stomp connection open");
-                            break;
-                        case ERROR:
-                            Log.e(LOG_TAG, "Stomp connection error", lifecycleEvent.getException());
-                            break;
-                        case CLOSED:
-                            Log.e(LOG_TAG, "Stomp connection closed");
-                            resetSubscriptions();
-                            break;
-                    }
-                });
-
-        compositeDisposable.add(dispLifecycle);
-
-        Disposable dispTopic = mStompClient.topic("/topic/transactions")
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(messageHandler, throwable -> {
-                    Log.e(LOG_TAG, "Error on subscribe topic", throwable);
-                });
-
-        compositeDisposable.add(dispTopic);
-        mStompClient.connect();
+            compositeDisposable.add(dispTopic);
+            mStompClient.connect();
+        }
     }
+
 
     private OkHttpClient createHttpClient() {
         try {
@@ -120,16 +122,10 @@ public class WsConnection {
         }
     }
 
-    private void println(String stomp_connection_error) {
-        System.out.println(stomp_connection_error);
-    }
-
     private void resetSubscriptions() {
         if (compositeDisposable != null) {
             compositeDisposable.dispose();
         }
         compositeDisposable = new CompositeDisposable();
     }
-
-
 }

@@ -7,7 +7,7 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
 
-@Database(entities = {Trade.class}, version = 3, exportSchema = false)
+@Database(entities = {Trade.class}, version = 5, exportSchema = false)
 public abstract class TradeDataBase extends RoomDatabase {
     private static final String DB_NAME = "info.db";
     private static TradeDataBase tradeDataBase;

@@ -6,8 +6,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -22,11 +20,10 @@ import java.util.concurrent.BlockingQueue;
 import pro.evgen.tradeapp.R;
 import pro.evgen.tradeapp.data.Trade;
 import pro.evgen.tradeapp.data.TradeDataBase;
-import pro.evgen.tradeapp.utils.MainActivity;
+import pro.evgen.tradeapp.activities.MainActivity;
 import pro.evgen.tradeapp.ws.WsConnection;
 
 public class WebSocketService extends Service {
-    private static final String LOG_TAG = "TradeAppLog";
     private static int NOTIFY_ID = 1;
     private static final String CHANNEL_ID = "MyChanel11";
 
@@ -36,6 +33,7 @@ public class WebSocketService extends Service {
     private Uri ringURI;
     private Intent notificationIntent;
     private long[] vibrate;
+
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -53,10 +51,10 @@ public class WebSocketService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
         startLoad();
         return super.onStartCommand(intent, flags, startId);
     }
+
 
     public void startLoad() {
         BlockingQueue<Trade> queue = wsConnection.initConnection();
@@ -114,7 +112,6 @@ public class WebSocketService extends Service {
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                         .setContentIntent(contentIntent)
                         .setAutoCancel(true)
-                        .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_baseline_swap_vert_red))
                         .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALL))
                         .setVibrate(vibrate)
                         .setPriority(NotificationCompat.PRIORITY_HIGH).build();
@@ -128,10 +125,4 @@ public class WebSocketService extends Service {
         }
         NOTIFY_ID++;
     }
-
-    private Bitmap setDrawableSort() {
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_baseline_swap_vert_red);
-        return bitmap;
-    }
-
 }

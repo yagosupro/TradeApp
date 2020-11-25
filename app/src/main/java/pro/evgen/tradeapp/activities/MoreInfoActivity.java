@@ -1,11 +1,11 @@
-package pro.evgen.tradeapp.utils;
+package pro.evgen.tradeapp.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -56,6 +56,7 @@ public class MoreInfoActivity extends AppCompatActivity {
 
     public void onClickGoToEtherscan(View view) {
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(hash));
+        Log.e("HASH",  hash);
         startActivity(intent);
     }
 }
