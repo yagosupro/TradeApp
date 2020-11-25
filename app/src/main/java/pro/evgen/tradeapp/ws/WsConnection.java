@@ -23,6 +23,7 @@ import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import pro.evgen.tradeapp.Constants;
 import pro.evgen.tradeapp.data.Trade;
+import pro.evgen.tradeapp.service.WebSocketService;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
 import ua.naiksoftware.stomp.dto.StompMessage;
@@ -30,7 +31,7 @@ import ua.naiksoftware.stomp.dto.StompMessage;
 public class WsConnection {
     private ObjectMapper mapper;
     private CompositeDisposable compositeDisposable;
-
+    private static boolean isWsConnection = false;
 
     public BlockingQueue<Trade> initConnection() {
         BlockingQueue<Trade> queue = new ArrayBlockingQueue<>(1000);
@@ -40,11 +41,9 @@ public class WsConnection {
             queue.add(mapper.readValue(s, Trade.class));
         });
         return queue;
-
     }
 
-
-    private void connect(Consumer<StompMessage> messageHandler) {
+    public void connect(Consumer<StompMessage> messageHandler) {
         StompClient mStompClient = null;
         try {
             mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP,
@@ -52,7 +51,7 @@ public class WsConnection {
                     null,
                     createHttpClient());
             resetSubscriptions();
-
+            WebSocketService.stompClient = mStompClient;
             Disposable dispLifecycle = mStompClient.lifecycle()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -62,7 +61,7 @@ public class WsConnection {
                                 Log.e(Constants.LOG_TAG, "Stomp connection open");
                                 break;
                             case ERROR:
-                                Log.e(Constants.LOG_TAG, "Stomp connection error", lifecycleEvent.getException());
+//                                Log.e(Constants.LOG_TAG, "Stomp connection error", lifecycleEvent.getException());
                                 break;
                             case CLOSED:
                                 Log.e(Constants.LOG_TAG, "Stomp connection closed");
@@ -72,7 +71,7 @@ public class WsConnection {
                     });
             compositeDisposable.add(dispLifecycle);
         }catch (Exception e){
-            Log.e(Constants.LOG_TAG, e.getMessage());
+//            Log.e(Constants.LOG_TAG, e.getMessage());
         }
 
 
@@ -81,14 +80,13 @@ public class WsConnection {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(messageHandler, throwable -> {
-                        Log.e(Constants.LOG_TAG, "Error on subscribe topic", throwable);
+//                        Log.e(Constants.LOG_TAG, "Error on subscribe topic", throwable);
                     });
 
             compositeDisposable.add(dispTopic);
             mStompClient.connect();
         }
     }
-
 
     private OkHttpClient createHttpClient() {
         try {
@@ -122,7 +120,7 @@ public class WsConnection {
         }
     }
 
-    private void resetSubscriptions() {
+    public void resetSubscriptions() {
         if (compositeDisposable != null) {
             compositeDisposable.dispose();
         }

@@ -11,17 +11,20 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import java.util.concurrent.BlockingQueue;
 
+import pro.evgen.tradeapp.Constants;
 import pro.evgen.tradeapp.R;
 import pro.evgen.tradeapp.data.Trade;
 import pro.evgen.tradeapp.data.TradeDataBase;
 import pro.evgen.tradeapp.activities.MainActivity;
 import pro.evgen.tradeapp.ws.WsConnection;
+import ua.naiksoftware.stomp.StompClient;
 
 public class WebSocketService extends Service {
     private static int NOTIFY_ID = 1;
@@ -33,7 +36,29 @@ public class WebSocketService extends Service {
     private Uri ringURI;
     private Intent notificationIntent;
     private long[] vibrate;
+    public static StompClient stompClient;
 
+    public static void setStompClient(StompClient stompClient) {
+        WebSocketService.stompClient = stompClient;
+    }
+
+    private void isConnectedWs(){
+        new Thread(()->{
+            while (true){
+                if (!stompClient.isConnected()){
+                    wsConnection.resetSubscriptions();
+                    stompClient.disconnect();
+                    try {
+                        startLoad();
+                        Thread.sleep(1500);
+
+                    }catch (Exception e){
+//                        Log.e(Constants.LOG_TAG, e.getMessage());
+                    }
+                }
+            }
+        }).start();
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -52,6 +77,7 @@ public class WebSocketService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         startLoad();
+        isConnectedWs();
         return super.onStartCommand(intent, flags, startId);
     }
 

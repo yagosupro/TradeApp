@@ -29,15 +29,15 @@ import pro.evgen.tradeapp.data.Trade;
 import pro.evgen.tradeapp.network.NetworkUtils;
 import pro.evgen.tradeapp.viewModels.TradeViewModel;
 
+import static pro.evgen.tradeapp.R.string.no_internet_connection;
+
 public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private TradeAdapter tradeAdapter;
     private SeekBar seekBar;
-    private TradeViewModel tradeViewModel;
     private static final String HASH_URL = "https://etherscan.io/tx/%s";
     private TextView lastPriceMain;
     private TradeFromRestViewModel tradeFromRestViewModel;
-    private CardViewModel cardViewModel;
 
 
     @Override
@@ -59,18 +59,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setCardFarmPriceInfo() {
-        cardViewModel = ViewModelProviders.of(MainActivity.this).get(CardViewModel.class);
+        CardViewModel cardViewModel = ViewModelProviders.of(MainActivity.this).get(CardViewModel.class);
         cardViewModel.getTradeLiveData().observe(this, new Observer<Trade>() {
             @Override
             public void onChanged(Trade trade) {
                 lastPriceMain.setText(String.valueOf(Math.floor(trade.getLastPrice() * 100) / 100.0));
+                Log.e(Constants.LOG_TAG, String.valueOf(trade.getAmount()));
             }
         });
 
 
     }
 
-    private void loadDataFromRest() {
+    public void loadDataFromRest() {
         try {
             if (NetworkUtils.checkNetwork(getApplicationContext())) {
                 tradeFromRestViewModel = ViewModelProviders.of(this).get(TradeFromRestViewModel.class);
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             } else {
-                Toast.makeText(this, "Sorry,no internet connectivty", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, no_internet_connection, Toast.LENGTH_SHORT).show();
             }
             tradeFromRestViewModel.loadDataFromRest();
         } catch (Exception e) {
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initTradeView(double moreThan) {
-        tradeViewModel = ViewModelProviders.of(MainActivity.this).get(TradeViewModel.class);
+        TradeViewModel tradeViewModel = ViewModelProviders.of(MainActivity.this).get(TradeViewModel.class);
         tradeViewModel.setMoreThan(moreThan);
         tradeViewModel.load();
         tradeViewModel.getTradeList().observe(MainActivity.this, new Observer<List<Trade>>() {
@@ -143,11 +144,11 @@ public class MainActivity extends AppCompatActivity {
             Trade trade = tradeAdapter.getTradeInfoList().get(position);
             String info = String.format("%s %s for %s %s", Math.floor(trade.getAmount() * 100) / 100.0, trade.getCoin(),
                     trade.getOtherCoin(), Math.floor(trade.getOtherAmount() * 100) / 100.0);
-            intent.putExtra("info", info);
-            intent.putExtra("blockDate", getDate(trade.getBlockDate()));
-            intent.putExtra("lastGas", Math.floor(trade.getLastGas() * 100) / 100.0);
-            intent.putExtra("lastPrice", Math.floor(trade.getLastPrice() * 100) / 100.0);
-            intent.putExtra("hash", getHash(trade.getHash()));
+            intent.putExtra(getString(R.string.info_label), info);
+            intent.putExtra(getString(R.string.blockdate_label), getDate(trade.getBlockDate()));
+            intent.putExtra(getString(R.string.lastgas_label), Math.floor(trade.getLastGas() * 100) / 100.0);
+            intent.putExtra(getString(R.string.lastprice_label), Math.floor(trade.getLastPrice() * 100) / 100.0);
+            intent.putExtra(getString(R.string.hash_label), getHash(trade.getHash()));
             startActivity(intent);
         });
     }
@@ -158,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
 
     private String getDate(long i) {
         Date date = new Date(i * 1000);
-        SimpleDateFormat sdf = new SimpleDateFormat("d/MM/yyyy hh:mm:ss aaa");
+        SimpleDateFormat sdf = new SimpleDateFormat(getString(R.string.sdf_parser));
         return sdf.format(date);
     }
 }
