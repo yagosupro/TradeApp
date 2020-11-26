@@ -11,24 +11,26 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
-import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import java.util.concurrent.BlockingQueue;
 
-import pro.evgen.tradeapp.Constants;
+import io.reactivex.disposables.CompositeDisposable;
+import pro.evgen.tradeapp.data.LoadTradeFromRest;
 import pro.evgen.tradeapp.R;
-import pro.evgen.tradeapp.data.Trade;
+import pro.evgen.tradeapp.pojo.Trade;
 import pro.evgen.tradeapp.data.TradeDataBase;
 import pro.evgen.tradeapp.activities.MainActivity;
+//import pro.evgen.tradeapp.viewModels.TradeFromRestViewModel;
 import pro.evgen.tradeapp.ws.WsConnection;
 import ua.naiksoftware.stomp.StompClient;
 
 public class WebSocketService extends Service {
     private static int NOTIFY_ID = 1;
     private static final String CHANNEL_ID = "MyChanel11";
+    private LoadTradeFromRest loadTradeFromRest;
 
     private WsConnection wsConnection;
     private TradeDataBase dataBase;
@@ -37,22 +39,20 @@ public class WebSocketService extends Service {
     private Intent notificationIntent;
     private long[] vibrate;
     public static StompClient stompClient;
+    private CompositeDisposable compositeDisposable;
 
-    public static void setStompClient(StompClient stompClient) {
-        WebSocketService.stompClient = stompClient;
-    }
-
-    private void isConnectedWs(){
-        new Thread(()->{
-            while (true){
-                if (!stompClient.isConnected()){
+    private void isConnectedWs() {
+        new Thread(() -> {
+            while (true) {
+                if (!stompClient.isConnected()) {
                     wsConnection.resetSubscriptions();
                     stompClient.disconnect();
                     try {
                         startLoad();
                         Thread.sleep(1500);
 
-                    }catch (Exception e){
+
+                    } catch (Exception e) {
 //                        Log.e(Constants.LOG_TAG, e.getMessage());
                     }
                 }
@@ -69,9 +69,9 @@ public class WebSocketService extends Service {
     public void onCreate() {
         super.onCreate();
         vibrate = new long[]{500, 500, 500};
-
         dataBase = TradeDataBase.getInstance(getApplicationContext());
         wsConnection = new WsConnection();
+        loadTradeFromRest = new LoadTradeFromRest(dataBase);
     }
 
     @Override
@@ -85,6 +85,7 @@ public class WebSocketService extends Service {
     public void startLoad() {
         BlockingQueue<Trade> queue = wsConnection.initConnection();
         new Thread(() -> {
+            loadTradeFromRest.loadDataFromRest();
             while (true) {
                 Trade trade = null;
                 String type = null;
@@ -109,7 +110,6 @@ public class WebSocketService extends Service {
             }
         }).start();
     }
-
 
     void sendNotification(String type, String coin, double amount, String otherCoin, double otherAmount) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

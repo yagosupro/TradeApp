@@ -1,14 +1,12 @@
-package pro.evgen.tradeapp.viewModels;
+package pro.evgen.tradeapp.view_models;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
-import pro.evgen.tradeapp.Constants;
-import pro.evgen.tradeapp.data.Trade;
+import pro.evgen.tradeapp.pojo.Trade;
 import pro.evgen.tradeapp.data.TradeDataBase;
 
 public class CardViewModel extends AndroidViewModel {

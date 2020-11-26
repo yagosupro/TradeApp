@@ -1,4 +1,4 @@
-package pro.evgen.tradeapp.viewModels;
+package pro.evgen.tradeapp.view_models;
 
 import android.app.Application;
 import android.os.AsyncTask;
@@ -11,7 +11,7 @@ import androidx.lifecycle.LiveData;
 
 import java.util.List;
 
-import pro.evgen.tradeapp.data.Trade;
+import pro.evgen.tradeapp.pojo.Trade;
 import pro.evgen.tradeapp.data.TradeDataBase;
 
 public class TradeViewModel extends AndroidViewModel {

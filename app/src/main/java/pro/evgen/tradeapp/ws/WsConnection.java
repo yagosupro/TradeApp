@@ -22,7 +22,7 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import pro.evgen.tradeapp.Constants;
-import pro.evgen.tradeapp.data.Trade;
+import pro.evgen.tradeapp.pojo.Trade;
 import pro.evgen.tradeapp.service.WebSocketService;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;

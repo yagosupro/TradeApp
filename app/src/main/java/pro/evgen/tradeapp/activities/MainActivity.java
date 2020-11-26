@@ -7,9 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,17 +17,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import pro.evgen.tradeapp.Constants;
 import pro.evgen.tradeapp.service.WebSocketService;
-import pro.evgen.tradeapp.viewModels.CardViewModel;
-import pro.evgen.tradeapp.viewModels.TradeFromRestViewModel;
+import pro.evgen.tradeapp.view_models.CardViewModel;
 import pro.evgen.tradeapp.R;
 import pro.evgen.tradeapp.adapters.TradeAdapter;
-import pro.evgen.tradeapp.data.Trade;
-import pro.evgen.tradeapp.network.NetworkUtils;
-import pro.evgen.tradeapp.viewModels.TradeViewModel;
-
-import static pro.evgen.tradeapp.R.string.no_internet_connection;
+import pro.evgen.tradeapp.pojo.Trade;
+import pro.evgen.tradeapp.view_models.TradeViewModel;
 
 public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
@@ -37,8 +30,6 @@ public class MainActivity extends AppCompatActivity {
     private SeekBar seekBar;
     private static final String HASH_URL = "https://etherscan.io/tx/%s";
     private TextView lastPriceMain;
-    private TradeFromRestViewModel tradeFromRestViewModel;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
         setAdapter();
         initSeekBar();
         initTradeView(0);
-        loadDataFromRest();
         showMore();
         setCardFarmPriceInfo();
 
@@ -64,30 +54,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(Trade trade) {
                 lastPriceMain.setText(String.valueOf(Math.floor(trade.getLastPrice() * 100) / 100.0));
-                Log.e(Constants.LOG_TAG, String.valueOf(trade.getAmount()));
             }
         });
-
-
-    }
-
-    public void loadDataFromRest() {
-        try {
-            if (NetworkUtils.checkNetwork(getApplicationContext())) {
-                tradeFromRestViewModel = ViewModelProviders.of(this).get(TradeFromRestViewModel.class);
-                tradeFromRestViewModel.getTrades().observe(this, new Observer<List<Trade>>() {
-                    @Override
-                    public void onChanged(List<Trade> tradeList) {
-                        tradeAdapter.setTradeInfoList(tradeList);
-                    }
-                });
-            } else {
-                Toast.makeText(this, no_internet_connection, Toast.LENGTH_SHORT).show();
-            }
-            tradeFromRestViewModel.loadDataFromRest();
-        } catch (Exception e) {
-            Log.e(Constants.LOG_TAG, e.getMessage());
-        }
     }
 
     private void initTradeView(double moreThan) {
@@ -99,8 +67,6 @@ public class MainActivity extends AppCompatActivity {
             public void onChanged(List<Trade> tradeList) {
                 tradeAdapter.setTradeInfoList(tradeList);
                 recyclerView.scrollToPosition(tradeAdapter.getItemCount() - 1);
-                Trade trade = tradeList.get(tradeAdapter.getItemCount() - 1);
-
             }
         });
         tradeViewModel.load();

@@ -1,4 +1,4 @@
-package pro.evgen.tradeapp.data;
+package pro.evgen.tradeapp.pojo;
 
 import android.util.Log;
 

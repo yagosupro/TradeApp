@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import pro.evgen.tradeapp.R;
-import pro.evgen.tradeapp.data.Trade;
+import pro.evgen.tradeapp.pojo.Trade;
 
 public class TradeAdapter extends RecyclerView.Adapter<TradeAdapter.TradeViewHolder> {
 
